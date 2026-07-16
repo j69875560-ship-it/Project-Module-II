@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wordly - Dictionary</title>
     <link rel="stylesheet" href="./css/style.css" />
+    <base target="_blank" />
   </head>
   <body>
     <header>
@@ -18,45 +19,45 @@
     </header>
     <main>
       <section id="search-section">
-        <form action="submit" id="form">
+        <form id="form">
           <label for="input-text">Type Word:</label>
           <div id="input-and-btn">
             <input
               type="text"
               id="input-text"
               placeholder="Enter word..."
-              autocomplete="address-level4"
+              autocomplete="off"
             />
             <button type="submit" id="search-btn">Search</button>
           </div>
         </form>
       </section>
+      <section id="message-section">
+        <div id="message">
+          <p id="loading-message"></p>
+        </div>
+        <div id="error-message-div">
+          <p id="error-message"></p>
+        </div>
+      </section>
+      <section id="results-section">
+        <div id="searched-words"></div>
+        <div id="pronunciation-text"></div>
+        <div id="audio-control"></div>
+        <div id="meanings"></div>
+        <div id="definitions"></div>
+        <div id="examples"></div>
+        <div id="synonyms"></div>
+        <div id="source-link"></div>
+        <button type="button" id="favourite-btn"></button>
+      </section>
+      <section id="favourite-section">
+        <h2>Favourites</h2>
+        <div id="favourite-container">
+          <p class="empty-state">No favourite word saved yet!</p>
+        </div>
+      </section>
     </main>
-    <section id="message-section">
-      <div id="message">
-        <p id="message"></p>
-      </div>
-      <div id="error-message-div">
-        <p id="error-message"></p>
-      </div>
-    </section>
-    <section id="results-section">
-      <div id="searched-words"></div>
-      <div id="pronunciation-text"></div>
-      <div id="audio-control"></div>
-      <div id="meanings"></div>
-      <div id="definitions"></div>
-      <div id="examples"></div>
-      <div id="synonyms"></div>
-      <div id="source link"></div>
-      <button type="button" id="favourite-btn"></button>
-    </section>
-    <section id="favourite-section">
-      <h2>Favourites</h2>
-      <div id="favourite-container">
-        <p class="empty-state">No favourite word saved yet!</p>
-      </div>
-    </section>
-    <script src="./js/index.js"></script>
+    <script src="./js/index.js" defer></script>
   </body>
 </html>
