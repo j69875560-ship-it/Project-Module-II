@@ -65,3 +65,56 @@ form.addEventListener("submit", (e) => {
       setLoading(false);
     });
 });
+ 
+// COMMIT 4: FETCH WORD DATA FROM THE API
+// WHAT IS AN API?
+//   API stands for Application Programming Interface. Think of it like a
+//   waiter at a restaurant. You (the app) place an order (send a request),
+//   the waiter takes it to the kitchen (the server), and brings back your
+//   food (the response/data). The Free Dictionary API is a free service
+//   that gives us word definitions, pronunciations, examples, and more.
+//
+// WHAT IS fetch()?
+//   fetch() is a built-in browser function that sends an HTTP request to
+//   a URL and returns a "Promise". A Promise is like a promise in real
+//   life - it says "I will give you the result later". We use .then()
+//   to say "when you get the result, do this".
+//
+// WHAT IS encodeURIComponent()?
+//   URLs can only contain certain characters. If a word has spaces or
+//   special characters (like "hello world" or "cafe"), encodeURIComponent()
+//   converts them to URL-safe versions (e.g., "hello%20world").
+//
+// HOW IT WORKS STEP BY STEP:
+//   1. Build the URL by combining the API base URL with the word
+//   2. Call fetch(url) to send the request
+//   3. When the response comes back, check the status code:
+//        - 404 = word not found
+//        - anything else that's not OK = network/server error
+//   4. If OK, convert the response body from JSON text to a JavaScript object
+//   5. Return that object so the next .then() can use it
+
+function fetchWord(word) {
+  const url =
+    "https://api.dictionaryapi.dev/api/v2/entries/en/" +
+    encodeURIComponent(word);
+
+  return fetch(url).then((response) => {
+    // response.status is a number (like 200, 404, 500)
+    // 404 means the word does not exist in the dictionary
+    if (response.status === 404) {
+      throw new Error("not found");
+    }
+
+    // response.ok is true for status codes 200-299 (success range)
+    // If it's not OK, something went wrong on the server
+    if (!response.ok) {
+      throw new Error("network");
+    }
+
+    // response.json() reads the response body and parses it from
+    // JSON text into a real JavaScript object/array.
+    // It also returns a Promise, so we return it to chain to the next .then()
+    return response.json();
+  });
+}
