@@ -532,3 +532,68 @@ function showFavourites() {
   }
 }
 
+// ============================================
+// COMMIT 7: HELPER / UTILITY FUNCTIONS
+// ============================================
+// These are small helper functions that handle common UI tasks.
+// We put them in separate functions so we don't repeat the same code
+// in multiple places. This makes the code easier to read and maintain.
+
+// ----- showError() -----
+// Displays an error message in the error box.
+// Hides the loading box at the same time.
+function showError(msg) {
+  errorMessage.textContent = msg;
+  errorMessageDiv.classList.add("visible");
+  messageDiv.classList.remove("visible");
+}
+
+// ----- clearError() -----
+// Hides the error box and clears its text.
+function clearError() {
+  errorMessage.textContent = "";
+  errorMessageDiv.classList.remove("visible");
+}
+
+// ----- setLoading() -----
+// Shows or hides the loading state.
+// When loading is true:
+//   - Show "Loading..." in the message box
+//   - Hide the error box
+//   - Disable the Search button so the user can't click it again
+// When loading is false:
+//   - Hide the message box
+//   - Re-enable the Search button
+function setLoading(isLoading) {
+  if (isLoading) {
+    loadingMessage.textContent = "Loading...";
+    messageDiv.classList.add("visible");
+    errorMessageDiv.classList.remove("visible");
+    searchBtn.disabled = true;
+  } else {
+    loadingMessage.textContent = "";
+    messageDiv.classList.remove("visible");
+    searchBtn.disabled = false;
+  }
+}
+
+// ----- clearResults() -----
+// Resets all result areas to empty and hides the results section.
+// Also resets the current word variables.
+function clearResults() {
+  searchedWords.textContent = "";
+  pronunciationText.textContent = "";
+  audioControl.innerHTML = "";
+  meaningsDiv.innerHTML = "";
+  definitionsDiv.innerHTML = "";
+  examplesDiv.innerHTML = "";
+  synonymsDiv.innerHTML = "";
+  sourceLink.innerHTML = "";
+  favouriteBtn.textContent = "";
+  favouriteBtn.className = "";
+  favouriteBtn.onclick = null;
+  resultsSection.classList.remove("visible");
+  currentWord = "";
+  currentPhonetic = "";
+}
+
