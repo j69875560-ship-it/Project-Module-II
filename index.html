@@ -11,7 +11,7 @@
         <p>Wordly - Dictionary is a single-page dictonary. <br> Like any other dictonary you can look up words but it also allows you to select your favorite words and store them for later. <br> Your looked up words also give pronounciations so enjoy.</p>
     </header>
 <main>
-<form action="submit">
+<form action="submit" id="form">
 <label for="input-text">Type Word:</label>
 <input type="text" id="input-text" placeholder="Enter word..." autocomplete="address-level4">
 <button type="submit" id="submit-btn">Search</button>
@@ -23,5 +23,16 @@
 </div>
 </form>
 </main>
+<section id="results-section">
+<div id="searched-words"></div>
+<div id="pronunciation-text"></div>
+<div id="audio-control"></div>
+<div id="meanings"></div>
+<div id="definitions"></div>
+<div id="examples"></div>
+<div id="synonyms"></div>
+<div id="source link"></div>
+<button type="button" id="favourite-btn"></button>
+</section>
 </body>
 </html>
