@@ -1,0 +1,285 @@
+/* Base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 20px;
+}
+
+/* Layout */
+header, main {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+}
+
+header p {
+    color: #666;
+}
+
+section {
+    margin-bottom: 25px;
+}
+
+/* Search form */
+#search-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+#input-and-btn{
+    display: flex;
+    gap: 10px;
+}
+
+#input-text {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#search-btn {
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#search-btn:hover {
+    background-color: #2980b9;
+}
+
+#search-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Messages */
+.message-section {
+    padding: 12px;
+    border-radius: 4px;
+    display: none;
+}
+
+.message-section.error {
+    display: block;
+    background-color: #ffe6e6;
+    color: #c0392b;
+    border: 1px solid #f5b7b1;
+}
+
+.message-section.loading {
+    display: block;
+    background-color: #eaf2f8;
+    color: #2c3e50;
+}
+
+/* Results */
+.results-section {
+    display: none;
+}
+
+.results-section.visible {
+    display: block;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.word-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.word-header h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+}
+
+.phonetic {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.audio-btn {
+    padding: 6px 12px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.audio-btn:hover {
+    background-color: #219a52;
+}
+
+.favorite-btn {
+    padding: 6px 12px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.favorite-btn.saved {
+    background-color: #95a5a6;
+}
+
+.favorite-btn:hover {
+    opacity: 0.9;
+}
+
+.meaning {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.meaning:last-child {
+    border-bottom: none;
+}
+
+.meaning h3 {
+    color: #8e44ad;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+
+.definitions-list {
+    list-style: decimal;
+    padding-left: 20px;
+}
+
+.definitions-list li {
+    margin-bottom: 10px;
+}
+
+.example {
+    color: #666;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.synonyms {
+    margin-top: 10px;
+}
+
+.synonyms strong {
+    color: #2c3e50;
+}
+
+.source-link {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.source-link a {
+    color: #3498db;
+}
+
+/* Favorites */
+.favorites-section h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.favorite-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.favorite-item .word-info {
+    cursor: pointer;
+}
+
+.favorite-item .word-info:hover {
+    color: #3498db;
+}
+
+.favorite-item .word-info strong {
+    font-size: 1.1rem;
+}
+
+.favorite-item .word-info .phonetic-small {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-left: 8px;
+}
+
+.remove-btn {
+    padding: 4px 10px;
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.remove-btn:hover {
+    background-color: #a93226;
+}
+
+.empty-state {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    body {
+        padding: 15px;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+
+    #search-btn {
+        width: 100%;
+    }
+
+    .word-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
