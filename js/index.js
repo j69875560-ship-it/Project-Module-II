@@ -342,3 +342,193 @@ function displayWord(data) {
   resultsSection.classList.add("visible");
 }
 
+
+// ============================================
+// COMMIT 6: FAVORITES FUNCTIONS (localStorage)
+// ============================================
+// WHAT IS localStorage?
+//   localStorage is a small built-in database inside your browser.
+//   It stores key-value pairs as STRINGS. The data stays even after
+//   you close the browser tab or restart your computer.
+//   Think of it like a simple filing cabinet where each drawer has a name (key)
+//   and contains a piece of paper with text on it (value).
+//
+// IMPORTANT: localStorage can ONLY store strings!
+//   If you want to save an array or object, you must convert it to a string first.
+//   JSON.stringify(object) converts an object/array into a JSON string.
+//   JSON.parse(string) converts a JSON string back into an object/array.
+//
+// OUR DATA STRUCTURE:
+//   We store favorites as an array of objects:
+//   [
+//     { word: "hello", phonetic: "/həˈloʊ/" },
+//     { word: "world", phonetic: "/wɜːld/" }
+//   ]
+//   We save this under the key "wordly_favourites".
+
+// ----- getFavourites() -----
+// Reads the saved favorites from localStorage.
+// Returns an array of objects, or an empty array if nothing is saved.
+function getFavourites() {
+  // localStorage.getItem("key") reads the value for that key.
+  // If the key doesn't exist, it returns null.
+  const stored = localStorage.getItem("wordly_favourites");
+
+  if (stored) {
+    try {
+      // stored is a string like '[{"word":"hello","phonetic":"/həˈloʊ/"}]'
+      // JSON.parse converts it back to a real JavaScript array
+      return JSON.parse(stored);
+    } catch (e) {
+      // If the stored string is corrupted (not valid JSON),
+      // JSON.parse will throw an error. We catch it and return an empty array.
+      return [];
+    }
+  }
+
+  // Nothing saved yet
+  return [];
+}
+
+// ----- saveFavourites() -----
+// Saves the favorites array to localStorage.
+// Converts the array to a string first using JSON.stringify.
+function saveFavourites(favourites) {
+  // JSON.stringify converts the array into a string like:
+  // '[{"word":"hello","phonetic":"/həˈloʊ/"}]'
+  // Then localStorage.setItem saves it under the key "wordly_favourites"
+  localStorage.setItem("wordly_favourites", JSON.stringify(favourites));
+}
+
+// ----- isFavourite() -----
+// Checks if a word is already in the favorites list.
+// We compare words in lowercase so "Hello" and "hello" are treated the same.
+function isFavourite(word) {
+  const favourites = getFavourites();
+
+  for (let i = 0; i < favourites.length; i++) {
+    if (favourites[i].word.toLowerCase() === word.toLowerCase()) {
+      return true; // Found it!
+    }
+  }
+
+  return false; // Not found
+}
+
+// ----- toggleFavourite() -----
+// Adds a word to favorites if it's not there, or removes it if it is.
+// Then updates the button text and re-renders the favorites list.
+function toggleFavourite(word, phonetic) {
+  const favourites = getFavourites();
+  let index = -1;
+
+  // Find the position of this word in the array
+  for (let i = 0; i < favourites.length; i++) {
+    if (favourites[i].word.toLowerCase() === word.toLowerCase()) {
+      index = i;
+      break;
+    }
+  }
+
+  if (index >= 0) {
+    // Word is already saved → remove it
+    // array.splice(index, 1) removes 1 item at the given index
+    favourites.splice(index, 1);
+    favouriteBtn.textContent = "Save Word";
+    favouriteBtn.className = "";
+  } else {
+    // Word is not saved → add it
+    // array.push(item) adds an item to the end of the array
+    favourites.push({ word: word, phonetic: phonetic || "" });
+    favouriteBtn.textContent = "Saved";
+    favouriteBtn.className = "saved";
+  }
+
+  // Save the updated array back to localStorage
+  saveFavourites(favourites);
+
+  // Re-render the favorites list on the page
+  showFavourites();
+}
+
+// ----- removeFavourite() -----
+// Removes a word from favorites (called when clicking the Remove button
+// in the favorites list). Also updates the Save button if that word
+// is currently being displayed.
+function removeFavourite(word) {
+  const favourites = getFavourites();
+  const newFavourites = [];
+
+  // Build a new array that excludes the word we want to remove
+  for (let i = 0; i < favourites.length; i++) {
+    if (favourites[i].word.toLowerCase() !== word.toLowerCase()) {
+      newFavourites.push(favourites[i]);
+    }
+  }
+
+  saveFavourites(newFavourites);
+  showFavourites();
+
+  // If the removed word is currently displayed, update its Save button
+  if (currentWord.toLowerCase() === word.toLowerCase()) {
+    favouriteBtn.textContent = "Save Word";
+    favouriteBtn.className = "";
+  }
+}
+
+// ----- showFavourites() -----
+// Reads the favorites from localStorage and builds the HTML to display them.
+// Each favorite item has a clickable word (to search again) and a Remove button.
+function showFavourites() {
+  const favourites = getFavourites();
+
+  // Clear the container first
+  favouriteContainer.innerHTML = "";
+
+  // If no favorites, show the empty state message
+  if (favourites.length === 0) {
+    const emptyP = document.createElement("p");
+    emptyP.className = "empty-state";
+    emptyP.textContent = "No favourite word saved yet!";
+    favouriteContainer.appendChild(emptyP);
+    return;
+  }
+
+  // Build each favorite item using createElement
+  for (let i = 0; i < favourites.length; i++) {
+    const fav = favourites[i];
+
+    const item = document.createElement("div");
+    item.className = "favourite-item";
+
+    // Word span (clickable to search again)
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "fav-word";
+    wordSpan.textContent = fav.word;
+    wordSpan.onclick = () => {
+      inputText.value = fav.word;
+      form.dispatchEvent(new Event("submit"));
+    };
+    item.appendChild(wordSpan);
+
+    // Phonetic span (if available)
+    if (fav.phonetic) {
+      const phoneticSpan = document.createElement("span");
+      phoneticSpan.className = "fav-phonetic";
+      phoneticSpan.textContent = fav.phonetic;
+      item.appendChild(phoneticSpan);
+    }
+
+    // Remove button
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "remove-btn";
+    removeBtn.textContent = "Remove";
+    removeBtn.onclick = () => {
+      removeFavourite(fav.word);
+    };
+    item.appendChild(removeBtn);
+
+    favouriteContainer.appendChild(item);
+  }
+}
+
