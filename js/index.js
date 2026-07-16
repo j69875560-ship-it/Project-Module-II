@@ -118,3 +118,227 @@ function fetchWord(word) {
     return response.json();
   });
 }
+// COMMIT 5: DISPLAY THE WORD DATA
+// ============================================
+// This function receives the data from the API and builds the HTML to
+// show the user. The API returns an ARRAY (a list) of word entries.
+// We use the first one: data[0].
+//
+// WHAT DOES THE API DATA LOOK LIKE?
+//   The API returns an array where each item is an object like this:
+//   {
+//     word: "hello",
+//     phonetic: "/həˈloʊ/",
+//     phonetics: [
+//       { text: "/həˈloʊ/", audio: "https://.../hello.mp3" },
+//       { text: "/həˈləʊ/", audio: "" }
+//     ],
+//     meanings: [
+//       {
+//         partOfSpeech: "noun",
+//         definitions: [
+//           { definition: "A greeting.", example: "Hello, everyone.", synonyms: [] },
+//           { definition: "Another meaning.", example: null, synonyms: ["hi"] }
+//         ],
+//         synonyms: ["greeting"]
+//       }
+//     ],
+//     sourceUrls: ["https://en.wiktionary.org/wiki/hello"]
+//   }
+//
+// IMPORTANT: Not every property is guaranteed to exist!
+//   Some words have no audio. Some have no examples. Some have no synonyms.
+//   We must check if each thing exists before using it.
+
+function displayWord(data) {
+  // Guard clause: if the data is not an array or is empty, show an error
+  if (!Array.isArray(data) || data.length === 0) {
+    showError(
+      "Something went wrong while loading the definition. Please try again.",
+    );
+    return;
+  }
+
+  const entry = data[0];
+
+  // Store the word and phonetic for the favorites feature
+  currentWord = entry.word || "";
+  currentPhonetic = entry.phonetic || "";
+
+  // The API sometimes puts the phonetic text inside a "phonetics" array
+  // instead of the top-level "phonetic" field. We loop through the
+  // phonetics array to find the first one that has text.
+  if (!currentPhonetic && entry.phonetics && entry.phonetics.length > 0) {
+    for (let i = 0; i < entry.phonetics.length; i++) {
+      if (entry.phonetics[i].text) {
+        currentPhonetic = entry.phonetics[i].text;
+        break; // Stop the loop once we find the first one
+      }
+    }
+  }
+
+  // Show the word title
+  searchedWords.textContent = currentWord;
+
+  // Show the phonetic text (or nothing if missing)
+  pronunciationText.textContent = currentPhonetic || "";
+
+  // ===== AUDIO BUTTON =====
+  // We loop through the phonetics array to find the first audio URL.
+  // Some phonetics have an empty string for audio, so we skip those.
+  let audioUrl = "";
+  if (entry.phonetics && Array.isArray(entry.phonetics)) {
+    for (let i = 0; i < entry.phonetics.length; i++) {
+      if (entry.phonetics[i].audio && entry.phonetics[i].audio.trim() !== "") {
+        audioUrl = entry.phonetics[i].audio;
+        break;
+      }
+    }
+  }
+
+  audioControl.innerHTML = "";
+  if (audioUrl) {
+    const playBtn = document.createElement("button");
+    playBtn.id = "play-audio";
+    playBtn.textContent = "Play Audio";
+    playBtn.onclick = () => {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(() => {
+        showError("Could not play audio.");
+      });
+    };
+    audioControl.appendChild(playBtn);
+  }
+
+  // ===== MEANINGS =====
+  // The API groups definitions by "part of speech" (noun, verb, adjective, etc.)
+  // Each "meaning" object has: partOfSpeech, definitions[], synonyms[]
+  // Each "definition" object has: definition, example, synonyms[]
+  meaningsDiv.innerHTML = "";
+  definitionsDiv.innerHTML = "";
+  examplesDiv.innerHTML = "";
+  synonymsDiv.innerHTML = "";
+
+  if (entry.meanings && entry.meanings.length > 0) {
+    for (let m = 0; m < entry.meanings.length; m++) {
+      const meaning = entry.meanings[m];
+
+      // Create a container for this part of speech
+      const block = document.createElement("div");
+      block.className = "meaning-block";
+
+      // Part of speech heading (e.g., "noun", "verb", "interjection")
+      const pos = document.createElement("h3");
+      pos.className = "part-of-speech";
+      pos.textContent = meaning.partOfSpeech || "unknown";
+      block.appendChild(pos);
+
+      meaningsDiv.appendChild(block);
+
+      // Definitions list
+      if (meaning.definitions && meaning.definitions.length > 0) {
+        const ol = document.createElement("ol");
+        ol.style.paddingLeft = "20px";
+
+        for (let d = 0; d < meaning.definitions.length; d++) {
+          const def = meaning.definitions[d];
+
+          const li = document.createElement("li");
+          li.className = "definition-item";
+
+          // Definition text
+          const defText = document.createElement("p");
+          defText.className = "definition-text";
+          defText.textContent = def.definition;
+          li.appendChild(defText);
+
+          ol.appendChild(li);
+        }
+
+        definitionsDiv.appendChild(ol);
+      }
+
+      // Examples
+      if (meaning.definitions) {
+        for (let d = 0; d < meaning.definitions.length; d++) {
+          if (meaning.definitions[d].example) {
+            const ex = document.createElement("p");
+            ex.className = "example-text";
+            ex.textContent =
+              'Example: "' + meaning.definitions[d].example + '"';
+            examplesDiv.appendChild(ex);
+          }
+        }
+      }
+
+      // ===== SYNONYMS =====
+      // Synonyms can exist at TWO levels:
+      //   1. meaning.synonyms (synonyms for the whole part of speech)
+      //   2. meaning.definitions[d].synonyms (synonyms for each definition)
+      // We collect ALL of them, then remove duplicates.
+      const allSynonyms = [];
+
+      // Collect from meaning-level
+      if (meaning.synonyms && Array.isArray(meaning.synonyms)) {
+        for (let s = 0; s < meaning.synonyms.length; s++) {
+          allSynonyms.push(meaning.synonyms[s]);
+        }
+      }
+
+      // Collect from definition-level
+      if (meaning.definitions) {
+        for (let d = 0; d < meaning.definitions.length; d++) {
+          if (
+            meaning.definitions[d].synonyms &&
+            Array.isArray(meaning.definitions[d].synonyms)
+          ) {
+            for (let s = 0; s < meaning.definitions[d].synonyms.length; s++) {
+              allSynonyms.push(meaning.definitions[d].synonyms[s]);
+            }
+          }
+        }
+      }
+
+      // Remove duplicates using a Set
+      // A Set is like an array but only stores unique values
+      const uniqueSynonyms = [...new Set(allSynonyms)];
+
+      if (uniqueSynonyms.length > 0) {
+        const synP = document.createElement("p");
+        synP.className = "synonyms-text";
+        synP.innerHTML =
+          "<strong>Synonyms:</strong> " + uniqueSynonyms.join(", ");
+        synonymsDiv.appendChild(synP);
+      }
+    }
+  }
+
+  // ===== SOURCE LINK =====
+  sourceLink.innerHTML = "";
+  if (entry.sourceUrls && entry.sourceUrls.length > 0) {
+    const link = document.createElement("a");
+    link.href = entry.sourceUrls[0];
+    link.target = "_blank";
+    link.textContent = "View Source";
+    sourceLink.appendChild(link);
+  }
+
+  // ===== FAVORITE BUTTON =====
+  // Check if this word is already saved, then set the button text and style
+  if (isFavourite(currentWord)) {
+    favouriteBtn.textContent = "Saved";
+    favouriteBtn.className = "saved";
+  } else {
+    favouriteBtn.textContent = "Save Word";
+    favouriteBtn.className = "";
+  }
+
+  // When the button is clicked, toggle this word in favorites
+  favouriteBtn.onclick = () => {
+    toggleFavourite(currentWord, currentPhonetic);
+  };
+
+  // Show the results section (it starts hidden in CSS)
+  resultsSection.classList.add("visible");
+}
+
