@@ -43,7 +43,7 @@ wordly/
 3. Open `index.html` use Live Server.
 4. Type a word in the search box and click **Search**.
 or
-1. Copy the link to the webpage and access it from there.
+1. Copy the link to the webpage and access it from there.[https://j69875560-ship-it.github.io/Project-Module-II/]
 
 ## API Information
 
@@ -68,10 +68,17 @@ The API returns meanings, pronunciation, audio, examples, synonyms, and source U
 
 ## Screenshots
 
+![Search Page](./assets/First-slide.jpg)
 
+## links and final sections
+1. Live Demo: [https://j69875560-ship-it.github.io/Project-Module-II/]
+2. GitHub repository URL: [https://github.com/j69875560-ship-it/Project-Module-II]
+3. Limitations: 
+I. There is a lack of audio,synmonames etc on some words.
+II. This dictionary is only coded for english word so words in other languages will be unable to give results.
+III. Not all browsers can support the audio playback.
+## Author-Name
+ Gitonga Johncarlos Mwenda.
 
-
-
-## License
-
+## Lisence
 This project is for a learning purposes and is a project from Moringa School.
