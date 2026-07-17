@@ -1,6 +1,7 @@
 # Wordly Dictionary SPA
 
-A simple single-page dictionary application that lets you search for English words, view definitions, hear pronunciations, and save your favorite words.
+It is a webpage that acts as a dictonary. It is a single page application so all tasks and operations are performened on one page.
+In order to actually retreie words and their meanings it uses a public dictonary API that retreives the synonames, meanings, phonetics etc.
 
 ## Features
 
@@ -16,9 +17,9 @@ A simple single-page dictionary application that lets you search for English wor
 
 ## Technologies Used
 
-- HTML5
-- CSS3
-- JavaScript (vanilla)
+- HTML
+- CSS
+- JavaScript
 - [Free Dictionary API](https://dictionaryapi.dev/)
 - localStorage
 
@@ -39,8 +40,10 @@ wordly/
 
 1. Download or clone this repository.
 2. Open the project folder.
-3. Open `index.html` in your browser, or use Live Server.
+3. Open `index.html` use Live Server.
 4. Type a word in the search box and click **Search**.
+or
+1. Copy the link to the webpage and access it from there.
 
 ## API Information
 
@@ -63,14 +66,11 @@ The API returns meanings, pronunciation, audio, examples, synonyms, and source U
 6. Click a saved word in the Favorites section to search it again.
 7. Click **Remove** to delete a word from favorites.
 
-## Known Limitations
+## Screenshots
 
-- Some words may lack audio, examples, or synonyms.
-- Only English words are supported.
-- Audio playback depends on browser support.
 
-## Author
-    Gitonga Johncarlos Mwenda
+
+
 
 ## License
 
