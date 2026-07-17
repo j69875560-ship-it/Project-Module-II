@@ -69,6 +69,9 @@ The API returns meanings, pronunciation, audio, examples, synonyms, and source U
 ## Screenshots
 
 ![Search Page](./First-slide.jpg)
+![Search Page](./second-slide.jpg)
+![Search Page](./third-slide.jpg)
+![Search Page](./fourth-slide.jpg)
 
 ## links and final sections
 1. Live Demo: [https://j69875560-ship-it.github.io/Project-Module-II/]
