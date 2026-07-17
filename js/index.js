@@ -44,7 +44,7 @@ form.addEventListener("submit", (e) => {
   setLoading(true);
   // promise with 3 possible endings.1.Success, .then-runs,.catch-skipped, .finnaly-runs
   // 2.word not found (404) ,.then-skipped, catch-runs with "not found" when the browser returns it>.finnally-runs
-// 3. Network error, .then()-skipped,.catch-runs with "network">.finall-still runs as it turns off loading spinner and re-enables button. 
+  // 3. Network error, .then()-skipped,.catch-runs with "network">.finall-still runs as it turns off loading spinner and re-enables button.
 
   fetchWord(word)
     .then((data) => {
@@ -65,93 +65,36 @@ form.addEventListener("submit", (e) => {
       setLoading(false);
     });
 });
- 
 // COMMIT 4: FETCH WORD DATA FROM THE API
-// WHAT IS AN API?
-//   API stands for Application Programming Interface. Think of it like a
-//   waiter at a restaurant. You (the app) place an order (send a request),
-//   the waiter takes it to the kitchen (the server), and brings back your
-//   food (the response/data). The Free Dictionary API is a free service
-//   that gives us word definitions, pronunciations, examples, and more.
-//
-// WHAT IS fetch()?
-//   fetch() is a built-in browser function that sends an HTTP request to
-//   a URL and returns a "Promise". A Promise is like a promise in real
-//   life - it says "I will give you the result later". We use .then()
-//   to say "when you get the result, do this".
-//
-// WHAT IS encodeURIComponent()?
-//   URLs can only contain certain characters. If a word has spaces or
-//   special characters (like "hello world" or "cafe"), encodeURIComponent()
-//   converts them to URL-safe versions (e.g., "hello%20world").
-//
-// HOW IT WORKS STEP BY STEP:
-//   1. Build the URL by combining the API base URL with the word
-//   2. Call fetch(url) to send the request
-//   3. When the response comes back, check the status code:
-//        - 404 = word not found
-//        - anything else that's not OK = network/server error
-//   4. If OK, convert the response body from JSON text to a JavaScript object
-//   5. Return that object so the next .then() can use it
-
 function fetchWord(word) {
+  // encodeURI converts the word to a url safe version.
   const url =
     "https://api.dictionaryapi.dev/api/v2/entries/en/" +
     encodeURIComponent(word);
-
+  // response is the parameter it can be any word
   return fetch(url).then((response) => {
     // response.status is a number (like 200, 404, 500)
     // 404 means the word does not exist in the dictionary
     if (response.status === 404) {
+      // It is actually better to use throw rather than return as return will just return back a normal value while throw stops the function immediately and jumps to .catch()
       throw new Error("not found");
     }
-
     // response.ok is true for status codes 200-299 (success range)
     // If it's not OK, something went wrong on the server
     if (!response.ok) {
       throw new Error("network");
     }
-
-    // response.json() reads the response body and parses it from
-    // JSON text into a real JavaScript object/array.
-    // It also returns a Promise, so we return it to chain to the next .then()
+    // response.json() will read the response body and parses it from
+    // JSON text into a real JavaScript object/array so it can be better manipulated instead of being strings.
+    // It will also return a Promise, so it will return it to chain to the next .then()
     return response.json();
   });
 }
+// The API looks like word:eg "car", phonetic:"ka:r/", meanings[...]. So its a good idea to convert to object for easier manipulation like
 // COMMIT 5: DISPLAY THE WORD DATA
-// ============================================
-// This function receives the data from the API and builds the HTML to
-// show the user. The API returns an ARRAY (a list) of word entries.
-// We use the first one: data[0].
-//
-// WHAT DOES THE API DATA LOOK LIKE?
-//   The API returns an array where each item is an object like this:
-//   {
-//     word: "hello",
-//     phonetic: "/həˈloʊ/",
-//     phonetics: [
-//       { text: "/həˈloʊ/", audio: "https://.../hello.mp3" },
-//       { text: "/həˈləʊ/", audio: "" }
-//     ],
-//     meanings: [
-//       {
-//         partOfSpeech: "noun",
-//         definitions: [
-//           { definition: "A greeting.", example: "Hello, everyone.", synonyms: [] },
-//           { definition: "Another meaning.", example: null, synonyms: ["hi"] }
-//         ],
-//         synonyms: ["greeting"]
-//       }
-//     ],
-//     sourceUrls: ["https://en.wiktionary.org/wiki/hello"]
-//   }
-//
-// IMPORTANT: Not every property is guaranteed to exist!
-//   Some words have no audio. Some have no examples. Some have no synonyms.
-//   We must check if each thing exists before using it.
 
 function displayWord(data) {
-  // Guard clause: if the data is not an array or is empty, show an error
+  // Guard clause: if the data is not an array or is empty, show an error. The array is from the json.
   if (!Array.isArray(data) || data.length === 0) {
     showError(
       "Something went wrong while loading the definition. Please try again.",
@@ -165,9 +108,7 @@ function displayWord(data) {
   currentWord = entry.word || "";
   currentPhonetic = entry.phonetic || "";
 
-  // The API sometimes puts the phonetic text inside a "phonetics" array
-  // instead of the top-level "phonetic" field. We loop through the
-  // phonetics array to find the first one that has text.
+  // To loop through the phonetic arrays incase one has nothing. To ensure we display those that have sth and if nothing remain blank.
   if (!currentPhonetic && entry.phonetics && entry.phonetics.length > 0) {
     for (let i = 0; i < entry.phonetics.length; i++) {
       if (entry.phonetics[i].text) {
@@ -184,8 +125,7 @@ function displayWord(data) {
   pronunciationText.textContent = currentPhonetic || "";
 
   // ===== AUDIO BUTTON =====
-  // We loop through the phonetics array to find the first audio URL.
-  // Some phonetics have an empty string for audio, so we skip those.
+  // It will loop through the phonetics array to find the first audio URL. But some phonetics have an empty string for audio so skip.
   let audioUrl = "";
   if (entry.phonetics && Array.isArray(entry.phonetics)) {
     for (let i = 0; i < entry.phonetics.length; i++) {
@@ -272,20 +212,20 @@ function displayWord(data) {
       }
 
       // ===== SYNONYMS =====
-      // Synonyms can exist at TWO levels:
+      // The synonyms in this api exist in two states:
       //   1. meaning.synonyms (synonyms for the whole part of speech)
       //   2. meaning.definitions[d].synonyms (synonyms for each definition)
-      // We collect ALL of them, then remove duplicates.
+      // I should collect all of them but also remove the duplicates.
       const allSynonyms = [];
 
-      // Collect from meaning-level
+      // Collect from meaning.synonyms
       if (meaning.synonyms && Array.isArray(meaning.synonyms)) {
         for (let s = 0; s < meaning.synonyms.length; s++) {
           allSynonyms.push(meaning.synonyms[s]);
         }
       }
 
-      // Collect from definition-level
+      // Collect from meanimg.definition
       if (meaning.definitions) {
         for (let d = 0; d < meaning.definitions.length; d++) {
           if (
@@ -300,14 +240,14 @@ function displayWord(data) {
       }
 
       // Remove duplicates using a Set
-      // A Set is like an array but only stores unique values
       const uniqueSynonyms = [...new Set(allSynonyms)];
-
+      // A Set is like an array but only stores unique values. It will ensure no duplication of values
       if (uniqueSynonyms.length > 0) {
         const synP = document.createElement("p");
         synP.className = "synonyms-text";
         synP.innerHTML =
           "<strong>Synonyms:</strong> " + uniqueSynonyms.join(", ");
+        // i have used innerhtml instead of .textcontent as i want synonyms to be bold seperately and i dont want to create too many ids. .join is a good array method that will take in all items and join them synonyms and the uniqueSynonys array.
         synonymsDiv.appendChild(synP);
       }
     }
@@ -324,7 +264,7 @@ function displayWord(data) {
   }
 
   // ===== FAVORITE BUTTON =====
-  // Check if this word is already saved, then set the button text and style
+  // Check if this word is already saved, if not create i will create save button and style it.
   if (isFavourite(currentWord)) {
     favouriteBtn.textContent = "Saved";
     favouriteBtn.className = "saved";
@@ -342,67 +282,42 @@ function displayWord(data) {
   resultsSection.classList.add("visible");
 }
 
-
-// ============================================
 // COMMIT 6: FAVORITES FUNCTIONS (localStorage)
-// ============================================
-// WHAT IS localStorage?
-//   localStorage is a small built-in database inside your browser.
-//   It stores key-value pairs as STRINGS. The data stays even after
-//   you close the browser tab or restart your computer.
-//   Think of it like a simple filing cabinet where each drawer has a name (key)
-//   and contains a piece of paper with text on it (value).
-//
-// IMPORTANT: localStorage can ONLY store strings!
-//   If you want to save an array or object, you must convert it to a string first.
+//Local storage only stores key-value pairs as strings.
+//  So since localStorage can ONLY store strings. remeber to use the following.
 //   JSON.stringify(object) converts an object/array into a JSON string.
 //   JSON.parse(string) converts a JSON string back into an object/array.
-//
-// OUR DATA STRUCTURE:
-//   We store favorites as an array of objects:
-//   [
-//     { word: "hello", phonetic: "/həˈloʊ/" },
-//     { word: "world", phonetic: "/wɜːld/" }
-//   ]
-//   We save this under the key "wordly_favourites".
+//   I should also use a key "wordly_favourites".
 
 // ----- getFavourites() -----
 // Reads the saved favorites from localStorage.
 // Returns an array of objects, or an empty array if nothing is saved.
 function getFavourites() {
-  // localStorage.getItem("key") reads the value for that key.
-  // If the key doesn't exist, it returns null.
+  // localStorage.getItem("key") reads the value for that key.If the key doesn't exist, it returns null
   const stored = localStorage.getItem("wordly_favourites");
 
   if (stored) {
     try {
-      // stored is a string like '[{"word":"hello","phonetic":"/həˈloʊ/"}]'
-      // JSON.parse converts it back to a real JavaScript array
       return JSON.parse(stored);
+      // stored is a string. JSON.parse converts it back to a real JavaScript array
     } catch (e) {
-      // If the stored string is corrupted (not valid JSON),
-      // JSON.parse will throw an error. We catch it and return an empty array.
       return [];
+      // If the stored string is corrupted (not valid JSON),JSON.parse will throw an error. I catch it and IT should return an empty array.
     }
   }
 
-  // Nothing saved yet
   return [];
+  // if nothing has been saved yet
 }
 
 // ----- saveFavourites() -----
 // Saves the favorites array to localStorage.
-// Converts the array to a string first using JSON.stringify.
 function saveFavourites(favourites) {
-  // JSON.stringify converts the array into a string like:
-  // '[{"word":"hello","phonetic":"/həˈloʊ/"}]'
-  // Then localStorage.setItem saves it under the key "wordly_favourites"
   localStorage.setItem("wordly_favourites", JSON.stringify(favourites));
 }
 
 // ----- isFavourite() -----
 // Checks if a word is already in the favorites list.
-// We compare words in lowercase so "Hello" and "hello" are treated the same.
 function isFavourite(word) {
   const favourites = getFavourites();
 
@@ -417,7 +332,6 @@ function isFavourite(word) {
 
 // ----- toggleFavourite() -----
 // Adds a word to favorites if it's not there, or removes it if it is.
-// Then updates the button text and re-renders the favorites list.
 function toggleFavourite(word, phonetic) {
   const favourites = getFavourites();
   let index = -1;
@@ -431,15 +345,13 @@ function toggleFavourite(word, phonetic) {
   }
 
   if (index >= 0) {
-    // Word is already saved → remove it
-    // array.splice(index, 1) removes 1 item at the given index
     favourites.splice(index, 1);
+    // Word is already saved → remove it.array.splice(index, 1) removes 1 item at the given index
     favouriteBtn.textContent = "Save Word";
     favouriteBtn.className = "";
   } else {
-    // Word is not saved → add it
-    // array.push(item) adds an item to the end of the array
     favourites.push({ word: word, phonetic: phonetic || "" });
+    // Word is not saved → add it, array.push(item) adds an item to the end of the array
     favouriteBtn.textContent = "Saved";
     favouriteBtn.className = "saved";
   }
@@ -452,56 +364,52 @@ function toggleFavourite(word, phonetic) {
 }
 
 // ----- removeFavourite() -----
-// Removes a word from favorites (called when clicking the Remove button
-// in the favorites list). Also updates the Save button if that word
-// is currently being displayed.
+// Removes a word from favorites (called when clicking the Remove button in the favorites list)
 function removeFavourite(word) {
   const favourites = getFavourites();
   const newFavourites = [];
 
-  // Build a new array that excludes the word we want to remove
   for (let i = 0; i < favourites.length; i++) {
     if (favourites[i].word.toLowerCase() !== word.toLowerCase()) {
       newFavourites.push(favourites[i]);
     }
   }
-
+  // Build a new array that excludes the word we want to remove
   saveFavourites(newFavourites);
   showFavourites();
 
-  // If the removed word is currently displayed, update its Save button
   if (currentWord.toLowerCase() === word.toLowerCase()) {
     favouriteBtn.textContent = "Save Word";
     favouriteBtn.className = "";
+    // If the removed word is currently displayed, update its Save button
   }
 }
 
 // ----- showFavourites() -----
 // Reads the favorites from localStorage and builds the HTML to display them.
-// Each favorite item has a clickable word (to search again) and a Remove button.
+// Each favorite item should have a clickable word (to search again) and a Remove button.
 function showFavourites() {
   const favourites = getFavourites();
 
-  // Clear the container first
   favouriteContainer.innerHTML = "";
+  // Clears the container first
 
-  // If no favorites, show the empty state message
   if (favourites.length === 0) {
     const emptyP = document.createElement("p");
     emptyP.className = "empty-state";
     emptyP.textContent = "No favourite word saved yet!";
     favouriteContainer.appendChild(emptyP);
     return;
+    // If no favorites, show the empty state message
   }
 
-  // Build each favorite item using createElement
   for (let i = 0; i < favourites.length; i++) {
     const fav = favourites[i];
 
     const item = document.createElement("div");
     item.className = "favourite-item";
+    // Build each favorite item using createElement
 
-    // Word span (clickable to search again)
     const wordSpan = document.createElement("span");
     wordSpan.className = "fav-word";
     wordSpan.textContent = fav.word;
@@ -510,16 +418,16 @@ function showFavourites() {
       form.dispatchEvent(new Event("submit"));
     };
     item.appendChild(wordSpan);
+    // Word span (clickable to search again)
 
-    // Phonetic span (if available)
     if (fav.phonetic) {
       const phoneticSpan = document.createElement("span");
       phoneticSpan.className = "fav-phonetic";
       phoneticSpan.textContent = fav.phonetic;
       item.appendChild(phoneticSpan);
+      // Phonetic span (if available)
     }
 
-    // Remove button
     const removeBtn = document.createElement("button");
     removeBtn.className = "remove-btn";
     removeBtn.textContent = "Remove";
@@ -529,19 +437,14 @@ function showFavourites() {
     item.appendChild(removeBtn);
 
     favouriteContainer.appendChild(item);
+    // Remove button
   }
 }
 
-// ============================================
 // COMMIT 7: HELPER / UTILITY FUNCTIONS
-// ============================================
-// These are small helper functions that handle common UI tasks.
-// We put them in separate functions so we don't repeat the same code
-// in multiple places. This makes the code easier to read and maintain.
 
 // ----- showError() -----
-// Displays an error message in the error box.
-// Hides the loading box at the same time.
+// Displays an error message in the error box and should hide loading???
 function showError(msg) {
   errorMessage.textContent = msg;
   errorMessageDiv.classList.add("visible");
@@ -556,14 +459,6 @@ function clearError() {
 }
 
 // ----- setLoading() -----
-// Shows or hides the loading state.
-// When loading is true:
-//   - Show "Loading..." in the message box
-//   - Hide the error box
-//   - Disable the Search button so the user can't click it again
-// When loading is false:
-//   - Hide the message box
-//   - Re-enable the Search button
 function setLoading(isLoading) {
   if (isLoading) {
     loadingMessage.textContent = "Loading...";
@@ -574,12 +469,13 @@ function setLoading(isLoading) {
     loadingMessage.textContent = "";
     messageDiv.classList.remove("visible");
     searchBtn.disabled = false;
+    // Shows or hides the loading state.
+    // When loading is true:- Show "Loading..." in the message box - Hide the error box-Disable the Search button so the user can't click it again
+    // When loading is false:- Hide the message box- Re-enable the Search button
   }
 }
 
 // ----- clearResults() -----
-// Resets all result areas to empty and hides the results section.
-// Also resets the current word variables.
 function clearResults() {
   searchedWords.textContent = "";
   pronunciationText.textContent = "";
@@ -595,5 +491,6 @@ function clearResults() {
   resultsSection.classList.remove("visible");
   currentWord = "";
   currentPhonetic = "";
+  // Resets all result areas to empty and hides the results section.
+  // Also resets the current word variables.
 }
-
