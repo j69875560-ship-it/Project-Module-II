@@ -453,13 +453,24 @@ function showError(msg) {
 
 // ----- clearError() -----
 // Hides the error box and clears its text.
-function clearError() {
-  errorMessage.textContent = "";
-  errorMessageDiv.classList.remove("visible");
-}
+
 
 // ----- setLoading() -----
-
+function setLoading(isLoading) {
+  if (isLoading) {
+    loadingMessage.textContent = "Loading...";
+    messageDiv.classList.add("visible");
+    errorMessageDiv.classList.remove("visible");
+    searchBtn.disabled = true;
+  } else {
+    loadingMessage.textContent = "";
+    messageDiv.classList.remove("visible");
+    searchBtn.disabled = false;
+    // Shows or hides the loading state.
+    // When loading is true:- Show "Loading..." in the message box - Hide the error box-Disable the Search button so the user can't click it again
+    // When loading is false:- Hide the message box- Re-enable the Search button
+  }
+}
 
 // ----- clearResults() -----
 function clearResults() {
