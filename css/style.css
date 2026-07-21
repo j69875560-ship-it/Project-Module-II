@@ -137,35 +137,7 @@ header p {
     display: block;
 }
 
-/* ===== Results Section ===== */
-#results-section {
-    max-width: 600px;
-    margin: 0 auto 25px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    border: 1px solid #d4af37;
-    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.15);
-    display: none;
-}
 
-#results-section.visible {
-    display: block;
-}
-
-#searched-words {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #d4af37;
-    margin-bottom: 6px;
-}
-
-#pronunciation-text {
-    color: #777;
-    font-style: italic;
-    margin-bottom: 12px;
-    font-size: 1.05rem;
-}
 
 #audio-control {
     margin-bottom: 18px;
