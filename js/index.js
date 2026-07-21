@@ -357,7 +357,7 @@ function toggleFavourite(word, phonetic) {
   }
 
   // Save the updated array back to localStorage
-  
+  saveFavourites(favourites);
 
   // Re-render the favorites list on the page
   showFavourites();
