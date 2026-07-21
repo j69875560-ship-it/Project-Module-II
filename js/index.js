@@ -476,3 +476,21 @@ function setLoading(isLoading) {
 }
 
 // ----- clearResults() -----
+function clearResults() {
+  searchedWords.textContent = "";
+  pronunciationText.textContent = "";
+  audioControl.innerHTML = "";
+  meaningsDiv.innerHTML = "";
+  definitionsDiv.innerHTML = "";
+  examplesDiv.innerHTML = "";
+  synonymsDiv.innerHTML = "";
+  sourceLink.innerHTML = "";
+  favouriteBtn.textContent = "";
+  favouriteBtn.className = "";
+  favouriteBtn.onclick = null;
+  resultsSection.classList.remove("visible");
+  currentWord = "";
+  currentPhonetic = "";
+  // Resets all result areas to empty and hides the results section.
+  // Also resets the current word variables.
+}
