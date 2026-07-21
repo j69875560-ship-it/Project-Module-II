@@ -360,7 +360,8 @@ function toggleFavourite(word, phonetic) {
   saveFavourites(favourites);
 
   // Re-render the favorites list on the page
-  
+  showFavourites();
+}
 
 // ----- removeFavourite() -----
 // Removes a word from favorites (called when clicking the Remove button in the favorites list)
